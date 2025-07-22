@@ -5,28 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Currency Converter</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', sans-serif;
       text-align: center;
       padding: 40px;
-      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
-      color: #333;
-    }
-    h1 {
+      background: linear-gradient(to right, #667eea, #764ba2);
       color: #fff;
-      background-color: #4e54c8;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      background-color: #6a11cb;
       padding: 15px;
       border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      font-size: 28px;
+      animation: popIn 0.8s ease-out;
     }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
     .converter-box {
       background-color: #fff;
       padding: 30px;
       border-radius: 15px;
       max-width: 400px;
-      margin: 20px auto;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      margin: 30px auto;
+      color: #333;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transform: translateY(20px);
+      animation: slideUp 1s forwards;
     }
+
+    @keyframes slideUp {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     select, input {
       padding: 12px;
       margin: 10px;
@@ -34,25 +58,36 @@
       width: 80%;
       border: 2px solid #ddd;
       border-radius: 8px;
+      transition: border 0.3s ease;
     }
+
+    select:focus, input:focus {
+      border-color: #6a11cb;
+      outline: none;
+    }
+
     button {
       padding: 12px 30px;
       font-size: 16px;
-      background-color: #4e54c8;
-      color: white;
+      background: linear-gradient(to right, #43e97b, #38f9d7);
+      color: #000;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+
     button:hover {
-      background-color: #6c63ff;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
+
     #result {
       margin-top: 20px;
-      font-size: 18px;
-      color: #4e54c8;
+      font-size: 20px;
       font-weight: bold;
+      color: #6a11cb;
+      transition: all 0.4s ease;
     }
   </style>
 </head>
@@ -74,12 +109,12 @@
     const toSelect = document.getElementById("to");
 
     currencies.forEach(code => {
-      let option1 = document.createElement("option");
+      const option1 = document.createElement("option");
       option1.value = code;
       option1.text = code;
       fromSelect.appendChild(option1);
 
-      let option2 = document.createElement("option");
+      const option2 = document.createElement("option");
       option2.value = code;
       option2.text = code;
       toSelect.appendChild(option2);
@@ -93,12 +128,21 @@
       const from = fromSelect.value;
       const to = toSelect.value;
 
-      const res = await fetch(`https://api.exchangerate-api.com/v4/latest/${from}`);
-      const data = await res.json();
-      const rate = data.rates[to];
-      const result = (amount * rate).toFixed(2);
+      if (!amount || isNaN(amount)) {
+        document.getElementById("result").innerText = "Please enter a valid amount.";
+        return;
+      }
 
-      document.getElementById("result").innerText = `${amount} ${from} = ${result} ${to}`;
+      try {
+        const res = await fetch(`https://api.exchangerate-api.com/v4/latest/${from}`);
+        const data = await res.json();
+        const rate = data.rates[to];
+        const result = (amount * rate).toFixed(2);
+
+        document.getElementById("result").innerText = `${amount} ${from} = ${result} ${to}`;
+      } catch (error) {
+        document.getElementById("result").innerText = "Error fetching data. Please try again.";
+      }
     }
   </script>
 </body>
